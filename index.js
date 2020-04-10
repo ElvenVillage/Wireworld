@@ -42,7 +42,7 @@ class Cell {
             }
             case states.head: {
                 this.neighbours
-                    .filter(item => item.state == states.wire)
+                    .filter(item => item.state === states.wire)
                     .forEach(item => item.newState = states.head);
                 this.newState = states.tail;
                 break;
@@ -124,7 +124,7 @@ document.querySelector("#submit").onclick = (e) => {
             break;
         }
         case "Stop": {
-            stop()
+            stop();
             e.target.value = "Start";
             break;
         }
@@ -170,10 +170,10 @@ const drawInv = () => {
         }
         if (x < 300) {
             selectedCell = states.head;
-            return;
         }
     }
 }
+
 
 requestAnimationFrame(redraw(1000, 1000));
 drawInv();
