@@ -142,9 +142,18 @@ cnv.onclick = (e) => {
     const i = Math.trunc(x / wh);
     const j = Math.trunc(y / wh);
     const cell = new Cell(i, j, selectedCell, []);
-    world.push(cell);
-    updateNeighbours();
-
+    let wasStated = false;
+    for (let k = 0; k < world.length; k++) {
+        if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
+            cell.neighbours = world[k].neighbours;
+            world[k] = cell;
+            wasStated = true;
+            break;
+    }}
+    if (!wasStated) {
+        world.push(cell);
+        updateNeighbours();
+    }
     redraw(1000, 1000)();
 };
 
