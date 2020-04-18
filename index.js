@@ -145,9 +145,9 @@ cnv.onclick = (e) => {
     let wasStated = false;
     for (let k = 0; k < world.length; k++) {
         if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
-            cell.neighbours = world[k].neighbours;
             world[k] = cell;
             wasStated = true;
+            updateNeighbours();
             break;
     }}
     if (!wasStated) {
@@ -181,7 +181,7 @@ const drawInv = () => {
             selectedCell = states.head;
         }
     }
-}
+};
 
 
 requestAnimationFrame(redraw(1000, 1000));
