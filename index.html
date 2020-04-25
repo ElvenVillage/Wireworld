@@ -4,17 +4,23 @@
     <meta charset="UTF-8">
     <title>Wireworld</title>
 </head>
-<body>
+<body id="body">
 <h2>Клеточный автомат Wireworld</h2>
 
 <div style="border-width: 4px">
     <input type="submit" value="Start" id="submit">
+    <input type="button" value="Сохранить" id="saveButton">
+    <input type="button" value="Загрузить" id="loadButton">
+    <input type="text" placeholder="JSON" id="name">
+    <select id="select">
+        <option value="" selected>0</option>
+        <option value='[{"x":5,"y":1,"state":1,"newState":1,"neighbours":[1,3]},{"x":6,"y":1,"state":1,"newState":1,"neighbours":[0,2]},{"x":7,"y":1,"state":1,"newState":1,"neighbours":[1,7]},{"x":4,"y":2,"state":1,"newState":1,"neighbours":[0,4]},{"x":5,"y":3,"state":1,"newState":1,"neighbours":[3,5]},{"x":6,"y":3,"state":2,"newState":2,"neighbours":[4,6]},{"x":7,"y":3,"state":3,"newState":3,"neighbours":[5,7]},{"x":8,"y":2,"state":1,"newState":1,"neighbours":[2,6,8]},{"x":9,"y":2,"state":1,"newState":1,"neighbours":[7,9]},{"x":10,"y":2,"state":1,"newState":1,"neighbours":[8,10]},{"x":11,"y":2,"state":1,"newState":1,"neighbours":[9]}]'>1</option>
+    </select>
 </div>
 <div>
-<canvas width="300" height="300" id="inv"></canvas>
+<canvas width="400" height="300" id="inv"></canvas>
 </div>
 <canvas width="1000" height="1000" style="border-width: 2px" id="cnv"></canvas>
-
 <script src="index.js"></script>
 </body>
 </html>

@@ -6,7 +6,8 @@ const wh = 50;
 const states = {
     wire: 1,
     head: 2,
-    tail: 3
+    tail: 3,
+    static: 4
 };
 
 const colors = (cell) => {
@@ -17,10 +18,12 @@ const colors = (cell) => {
             return "yellow";
         case 3:
             return "blue";
+        case 4:
+            return "black";
     }
-}
+};
 
-const world = [];
+let world = [];
 
 let isStarted = false;
 let selectedCell = states.wire;
@@ -33,26 +36,26 @@ class Cell {
         this.newState = state;
         this.neighbours = neighbours;
     }
-
-    tick() {
-        switch (this.state) {
-            case states.tail: {
-                this.newState = states.wire;
-                break;
-            }
-            case states.head: {
-                this.neighbours
-                    .filter(item => item.state === states.wire)
-                    .forEach(item => item.newState = states.head);
-                this.newState = states.tail;
-                break;
-            }
-        }
-    }
 }
 
+const tick = (cell) => {
+    switch (cell.state) {
+        case states.tail: {
+            cell.newState = states.wire;
+            break;
+        }
+        case states.head: {
+            cell.neighbours
+                .filter(item => world[item].state === states.wire)
+                .forEach(item => world[item].newState = states.head);
+            cell.newState = states.tail;
+            break;
+        }
+    }
+};
+
 const worldTick = () => {
-    world.forEach(cell => cell.tick());
+    world.forEach(cell => tick(cell));
     world.forEach(cell => {
         cell.state = cell.newState;
     })
@@ -79,21 +82,19 @@ const drawWorld = (world) => {
     })
 };
 
-const redraw = (x, y) => {
-    return () => {
-        drawGrid(x, y);
-        drawWorld(world);
-        requestAnimationFrame(redraw(1000, 1000));
-    }
+const redraw = () => {
+    drawGrid(1000, 1000);
+    drawWorld(world);
+    requestAnimationFrame(redraw);
 };
 
 const updateNeighbours = () => {
     for (let i = 0; i < world.length; i++) {
         world[i].neighbours = [];
         for (let j = 0; j < world.length; j++) {
-
+            if (i === j) continue;
             if ((Math.abs(world[i].x - world[j].x) <= 1) && (Math.abs(world[i].y - world[j].y) <= 1)) {
-                world[i].neighbours.push(world[j]);
+                world[i].neighbours.push(j);
             }
         }
     }
@@ -132,7 +133,6 @@ document.querySelector("#submit").onclick = (e) => {
 };
 
 
-
 //Обработчик нажатий на Canvas
 cnv.onclick = (e) => {
 
@@ -141,20 +141,31 @@ cnv.onclick = (e) => {
     const y = e.clientY - rect.top;
     const i = Math.trunc(x / wh);
     const j = Math.trunc(y / wh);
-    const cell = new Cell(i, j, selectedCell, []);
-    let wasStated = false;
-    for (let k = 0; k < world.length; k++) {
-        if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
-            world[k] = cell;
-            wasStated = true;
+    if (selectedCell != states.static) {
+        const cell = new Cell(i, j, selectedCell, []);
+        let wasStated = false;
+        for (let k = 0; k < world.length; k++) {
+            if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
+                world[k] = cell;
+                wasStated = true;
+                updateNeighbours();
+                break;
+            }
+        }
+        if (!wasStated) {
+            world.push(cell);
             updateNeighbours();
-            break;
-    }}
-    if (!wasStated) {
-        world.push(cell);
-        updateNeighbours();
+        }
+        redraw();
+    } else {
+        for (let k = 0; k < world.length; k++) {
+            if ((world[k].x === i) && (world[k].y === j)) {
+                world.splice(k, 1);
+                updateNeighbours();
+                redraw();
+            }
+        }
     }
-    redraw(1000, 1000)();
 };
 
 const drawInv = () => {
@@ -165,6 +176,8 @@ const drawInv = () => {
     ctxn.fillRect(100, 0, 100, 100);
     ctxn.fillStyle = colors(states.head);
     ctxn.fillRect(200, 0, 100, 100);
+    ctxn.fillStyle = colors(states.static);
+    ctxn.fillRect(300, 0, 100, 100);
     ctxn.stroke();
 
     document.querySelector("#inv").onclick = (e) => {
@@ -179,10 +192,29 @@ const drawInv = () => {
         }
         if (x < 300) {
             selectedCell = states.head;
+            return;
         }
+        selectedCell = states.static;
     }
 };
 
 
-requestAnimationFrame(redraw(1000, 1000));
+const loadSave = () => {
+    const save = document.getElementById("name").value;
+    world = JSON.parse(save);
+    updateNeighbours();
+};
+
+const saveWorld = () => {
+    document.getElementById("name").value = JSON.stringify(world)
+};
+
+document.getElementById("select").onchange = () => {
+    document.getElementById("name").value = document.getElementById("select").options[document.getElementById("select").selectedIndex].value;
+    loadSave();
+};
+
+document.getElementById("saveButton").onclick = saveWorld;
+document.getElementById("loadButton").onclick = loadSave;
+requestAnimationFrame(redraw);
 drawInv();
