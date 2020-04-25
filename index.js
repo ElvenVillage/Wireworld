@@ -45,11 +45,15 @@ const tick = (cell) => {
             break;
         }
         case states.head: {
-            cell.neighbours
-                .filter(item => world[item].state === states.wire)
-                .forEach(item => world[item].newState = states.head);
             cell.newState = states.tail;
             break;
+        }
+        case states.wire: {
+            let count = 0;
+            cell.neighbours.forEach((item) => {
+                if (world[item].state === states.head) count++;
+            })
+            if ((count === 1) || (count === 2)) cell.newState = states.head
         }
     }
 };
@@ -206,6 +210,11 @@ const loadSave = () => {
 };
 
 const saveWorld = () => {
+    const newWorld = world.slice();
+    for (let i = 0; i < newWorld.length; i++) {
+        delete newWorld[i].neighbours;
+        //delete newWorld[i].newState;
+    }
     document.getElementById("name").value = JSON.stringify(world)
 };
 
