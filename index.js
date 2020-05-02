@@ -28,6 +28,8 @@ let world = [];
 let isStarted = false;
 let selectedCell = states.wire;
 
+let wasLMBPressed = false;
+
 class Cell {
     constructor(x, y, state, neighbours) {
         this.x = x;
@@ -136,40 +138,48 @@ document.querySelector("#submit").onclick = (e) => {
     }
 };
 
-
+/*cnv.onmousedown = () => {
+    wasLMBPressed = true;
+}
+cnv.onmouseup = () => {
+    wasLMBPressed = false;
+}
+*/
 //Обработчик нажатий на Canvas
 cnv.onclick = (e) => {
-
-    rect = cnv.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const i = Math.trunc(x / wh);
-    const j = Math.trunc(y / wh);
-    if (selectedCell != states.static) {
-        const cell = new Cell(i, j, selectedCell, []);
-        let wasStated = false;
-        for (let k = 0; k < world.length; k++) {
-            if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
-                world[k] = cell;
-                wasStated = true;
+    let rect;
+    //if (wasLMBPressed) {
+        rect = cnv.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const i = Math.trunc(x / wh);
+        const j = Math.trunc(y / wh);
+        if (selectedCell != states.static) {
+            const cell = new Cell(i, j, selectedCell, []);
+            let wasStated = false;
+            for (let k = 0; k < world.length; k++) {
+                if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
+                    world[k] = cell;
+                    wasStated = true;
+                    updateNeighbours();
+                    break;
+                }
+            }
+            if (!wasStated) {
+                world.push(cell);
                 updateNeighbours();
-                break;
+            }
+            redraw();
+        } else {
+            for (let k = 0; k < world.length; k++) {
+                if ((world[k].x === i) && (world[k].y === j)) {
+                    world.splice(k, 1);
+                    updateNeighbours();
+                    redraw();
+                }
             }
         }
-        if (!wasStated) {
-            world.push(cell);
-            updateNeighbours();
-        }
-        redraw();
-    } else {
-        for (let k = 0; k < world.length; k++) {
-            if ((world[k].x === i) && (world[k].y === j)) {
-                world.splice(k, 1);
-                updateNeighbours();
-                redraw();
-            }
-        }
-    }
+    //}
 };
 
 const drawInv = () => {
@@ -188,14 +198,17 @@ const drawInv = () => {
         const x = e.clientX;
         if (x < 100) {
             selectedCell = states.wire;
+            document.body.style.cursor = "url(green.png), auto";
             return;
         }
         if (x < 200) {
             selectedCell = states.tail;
+            document.body.style.cursor = "url(blue.png), auto";
             return;
         }
         if (x < 300) {
             selectedCell = states.head;
+            document.body.style.cursor = "url(yellow.png), auto";
             return;
         }
         selectedCell = states.static;
