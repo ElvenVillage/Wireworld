@@ -138,17 +138,12 @@ document.querySelector("#submit").onclick = (e) => {
     }
 };
 
-/*cnv.onmousedown = () => {
-    wasLMBPressed = true;
-}
-cnv.onmouseup = () => {
-    wasLMBPressed = false;
-}
-*/
+
 //Обработчик нажатий на Canvas
-cnv.onclick = (e) => {
+cnv.onmousemove = (e) => {
     let rect;
-    //if (wasLMBPressed) {
+    if (wasLMBPressed) {
+
         rect = cnv.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -161,26 +156,36 @@ cnv.onclick = (e) => {
                 if ((world[k].x === cell.x) && (world[k].y === cell.y)) {
                     world[k] = cell;
                     wasStated = true;
-                    updateNeighbours();
+                    //updateNeighbours();
                     break;
                 }
             }
             if (!wasStated) {
                 world.push(cell);
-                updateNeighbours();
+                //updateNeighbours();
             }
             redraw();
         } else {
             for (let k = 0; k < world.length; k++) {
                 if ((world[k].x === i) && (world[k].y === j)) {
                     world.splice(k, 1);
-                    updateNeighbours();
+                    //updateNeighbours();
                     redraw();
                 }
             }
         }
-    //}
+    }
 };
+cnv.onmousedown = (e) => {
+    wasLMBPressed = true;
+    stop();
+    cnv.onmousemove(e)
+}
+cnv.onmouseup = () => {
+    wasLMBPressed = false;
+    updateNeighbours();
+}
+
 
 const drawInv = () => {
     const ctxn = document.querySelector("#inv").getContext("2d");
